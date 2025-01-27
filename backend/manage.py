@@ -2,7 +2,7 @@
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from server import create_app
-from models import db
+from backend.models.ext import db
 
 app = create_app()
 migrate = Migrate(app, db)

@@ -1,0 +1,60 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: tours_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: toursdb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - tours_network
+
+  backend:
+    build: ./backend
+    container_name: tours_backend
+    env_file: ./backend/.env
+    command: gunicorn wsgi:app --bind 0.0.0.0:5000
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+    networks:
+      - tours_network
+
+  frontend:
+    build: ./frontend
+    container_name: tours_frontend
+    environment:
+      - CI=false
+    command: ["npm", "run", "build"]
+    volumes:
+      - ./frontend:/app
+    networks:
+      - tours_network
+
+  nginx:
+    image: nginx:latest
+    container_name: tours_nginx
+    depends_on:
+      - backend
+      - frontend
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/build:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+      # In production, you'd also map 443 for SSL:
+      # - "443:443"
+    networks:
+      - tours_network
+
+networks:
+  tours_network:
+    driver: bridge
+
+volumes:
+  db_data:
