@@ -1,4 +1,4 @@
-from ext import db , datetime
+from ext import db , datetime, timezone
 
 class Review(db.Model):
     __tablename__ = 'reviews'
@@ -8,4 +8,4 @@ class Review(db.Model):
     user_name = db.Column(db.String(120), default='Anonymous')
     rating = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))

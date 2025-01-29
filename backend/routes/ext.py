@@ -1,4 +1,6 @@
-from backend.models.ext import db, bcrypt, User, Tour, Booking, Review
+from backend.models.ext import db, bcrypt
+from flask_restx import Resource, Namespace, reqparse
+
 import os
 import logging
 from flask import Flask, jsonify, request
@@ -8,6 +10,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_migrate import Migrate
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from werkzeug.security import generate_password_hash
 
 import stripe
 import paypalrestsdk
