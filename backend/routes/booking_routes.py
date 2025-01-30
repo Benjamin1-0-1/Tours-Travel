@@ -1,5 +1,6 @@
-from ext import reqparse, Namespace, Resource , db
+from routes.r_ext import reqparse, Namespace, Resource
 from models.booking import BookingPlacement
+from models.ext import db
 
 bookingPlacement_ns = Namespace("bookings", description="Booking operations")
 

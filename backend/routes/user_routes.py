@@ -1,7 +1,7 @@
-from ext import jsonify, request, jsonify, app, db, limiter,generate_password_hash,Namespace, Resource, reqparse, jwt_required,get_jwt_identity
+from routes.r_ext import jsonify, request, jsonify, app, db, limiter,generate_password_hash,Namespace, Resource, reqparse, jwt_required,get_jwt_identity
 from models.user import User
 
-user_profiles_ns = Namespace('user_profiles', description='User profile operations')
+user_profiles_ns = Namespace("User Profiles", description="User profiles related operations")
 
 def create_user_profile_parser():
     parser = reqparse.RequestParser()
@@ -50,7 +50,7 @@ class UserProfileResource(Resource):
             db.session.rollback()
             return {"error": "Failed to create user", "details": str(e)}, 500
 
-@user_profiles_ns("/v1/user-profiles/<int:id>")
+@user_profiles_ns.route("/v1/user-profiles/<int:id>")
 class AdminProfileResource(Resource):
     @jwt_required()
     def get(self, id):

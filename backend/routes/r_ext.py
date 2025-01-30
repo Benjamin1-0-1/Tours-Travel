@@ -1,4 +1,4 @@
-from backend.models.ext import db, bcrypt
+from models.ext import db, bcrypt
 from flask_restx import Resource, Namespace, reqparse
 
 import os
@@ -41,16 +41,12 @@ jwt = JWTManager(app)
 # app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=30)
 
 # Payment config
-stripe.api_key = app.config['STRIPE_SECRET_KEY']
-paypalrestsdk.configure({
-    "mode": "sandbox",  # or 'live'
-    "client_id": app.config['PAYPAL_CLIENT_ID'],
-    "client_secret": app.config['PAYPAL_CLIENT_SECRET']
-})
+# stripe.api_key = app.config['STRIPE_SECRET_KEY']
+# paypalrestsdk.configure({
+#     "mode": "sandbox",  # or 'live'
+#     "client_id": app.config['PAYPAL_CLIENT_ID'],
+#     "client_secret": app.config['PAYPAL_CLIENT_SECRET']
+# })
 
-# Rate limiting
-limiter = Limiter(
-        key_func=get_remote_address,
-        app=app,
-        default_limits=[app.config['RATELIMIT_DEFAULT']]
-    )
+# # Rate limiting
+limiter = Limiter(get_remote_address)

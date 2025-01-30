@@ -1,0 +1,17 @@
+.navbar {
+    background-color: #008cba;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+  }
+  .logo {
+    font-weight: bold;
+    text-decoration: none;
+    color: #fff;
+  }
+  .nav-links a {
+    margin-left: 1rem;
+    text-decoration: none;
+    color: #fff;
+  }

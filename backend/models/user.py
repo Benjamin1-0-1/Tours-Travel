@@ -1,4 +1,5 @@
-from ext import db, datetime, timezone
+# backend/models/user.py
+from models.ext import db, datetime, timezone
 from sqlalchemy.orm import validates
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -9,33 +10,23 @@ class User(db.Model):
     user_name = db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
-    created_at = db.Column(db.DateTime,
-        default=datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     is_active = db.Column(db.Boolean, default=True)
     is_verified = db.Column(db.Boolean, default=False)
+    # Add role for admin checks
+    role = db.Column(db.String(50), default="user")
 
     @validates('email')
     def validate_email(self, key, email):
-            if "@" not in email:
-                raise ValueError("Invalid email address")
-            return email
+        if "@" not in email:
+            raise ValueError("Invalid email address")
+        return email
 
-    @validates("password")
-    def validate_password(self, key, password):
-        if len(password) < 6:
-            raise ValueError("Password must be at least 6 characters long")
-        return generate_password_hash(password)
-
-    def __init__(self, **kwargs):
-            super().__init__(**kwargs)
-
-    @classmethod
-    def create_user(cls, **kwargs):
-        kwargs["password"] = generate_password_hash(kwargs["password"])
-        return cls(**kwargs)
+    def set_password(self, raw_password):
+        self.password_hash = generate_password_hash(raw_password)
 
     def check_password(self, raw_password):
-        return check_password_hash(self.password, raw_password)
+        return check_password_hash(self.password_hash, raw_password)
 
     def to_dict(self):
         return {
@@ -45,7 +36,8 @@ class User(db.Model):
             "created_at": self.created_at,
             "is_active": self.is_active,
             "is_verified": self.is_verified,
+            "role": self.role
         }
 
     def __repr__(self):
-        return f"<User {self.id} : ({self.email}) {self.user_name}>"
+        return f"<User {self.id}: {self.email} ({self.user_name})>"

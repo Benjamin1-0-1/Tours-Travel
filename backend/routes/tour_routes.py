@@ -1,4 +1,4 @@
-from ext import jsonify, request, jsonify, app, db, Namespace, Resource, Resource,reqparse
+from routes.r_ext import jsonify, request, jsonify, app, db, Namespace, Resource, Resource,reqparse
 from models.tour import Tours
 
 

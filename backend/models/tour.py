@@ -1,4 +1,5 @@
-from ext import db
+# backend/models/tour.py
+from models.ext import db, datetime, timezone
 
 class Tours(db.Model):
     __tablename__ = 'tours'
@@ -15,7 +16,7 @@ class Tours(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "nmae": self.name,
+            "name": self.name,  # corrected key from "nmae"
             "location": self.location,
             "price": self.price,
             "description": self.description,

@@ -1,24 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { getAllTours } from '../services/api';
-import TourCard from '../components/TourCard';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTours } from "../store/slices/toursSlice";
+import { Link } from 'react-router-dom';
 
 function HomePage() {
-  const [tours, setTours] = useState([]);
+  const dispatch = useDispatch();
+  const { tours, status, error } = useSelector((state) => state.tours);
 
   useEffect(() => {
-    getAllTours()
-      .then((res) => setTours(res.data))
-      .catch((err) => console.error(err));
-  }, []);
+    if (status === 'idle') {
+      dispatch(fetchTours());
+    }
+  }, [status, dispatch]);
+
+  if (status === 'loading') return <div>Loading...</div>;
+  if (status === 'failed') return <div>Error: {error}</div>;
 
   return (
-    <div>
-      <h1 style={{ textAlign: 'center' }}>Available Tours</h1>
-      <div className="tour-list">
+    <div style={{ padding: '2rem' }}>
+      <h2>Available Tours</h2>
+      <ul>
         {tours.map((tour) => (
-          <TourCard key={tour.id} tour={tour} />
+          <li key={tour.id}>
+            <Link to={`/tours/${tour.id}`}>{tour.name}</Link> - ${tour.price}
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

@@ -1,31 +1,56 @@
-# backend/config.py
 import os
+from datetime import timedelta
+from cryptography.fernet import Fernet
 from dotenv import load_dotenv
 
-load_dotenv()  # Load environment variables from .env if present
+load_dotenv()
 
 class Config:
-    SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret")
-    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "jwt-dev-secret")
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", "sqlite:///app.db")
+    SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "your-jwt-secret-key")
+    fernet_key = os.environ.get("FERNET_KEY")
+    FERNET = Fernet(fernet_key.encode()) if fernet_key else None
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(
+        seconds=int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRES", 86400))
+    )
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(
+        seconds=int(os.environ.get("JWT_REFRESH_TOKEN_EXPIRES", 2592000))
+    )
+    JWT_TOKEN_LOCATION = ["headers", "json"]
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "SQLALCHEMY_DATABASE_URI", "sqlite:///travels.db")
 
-    MAIL_SERVER = os.environ.get("MAIL_SERVER", "smtp.gmail.com")
-    MAIL_PORT = int(os.environ.get("MAIL_PORT", 587))
-    MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
-    MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
-    MAIL_USE_TLS = True
-    MAIL_USE_SSL = False
-    MAIL_DEFAULT_SENDER = os.environ.get("MAIL_DEFAULT_SENDER")
 
-    STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
-    PAYPAL_CLIENT_ID = os.environ.get("PAYPAL_CLIENT_ID", "")
-    PAYPAL_CLIENT_SECRET = os.environ.get("PAYPAL_CLIENT_SECRET", "")
-    MPESA_CONSUMER_KEY = os.environ.get("MPESA_CONSUMER_KEY", "")
-    MPESA_CONSUMER_SECRET = os.environ.get("MPESA_CONSUMER_SECRET", "")
-    MPESA_SHORTCODE = os.environ.get("MPESA_SHORTCODE", "")
-    MPESA_PASSKEY = os.environ.get("MPESA_PASSKEY", "")
-    MPESA_ENVIRONMENT = os.environ.get("MPESA_ENVIRONMENT", "sandbox")
+class DevelopmentConfig(Config):
 
-    RATELIMIT_DEFAULT = os.environ.get("RATELIMIT_DEFAULT", "100 per hour")
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "SQLALCHEMY_DATABASE_URI", "sqlite:///travels.db"
+    )
+
+
+class ProductionConfig(Config):
+    """Production configuration."""
+
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "SQLALCHEMY_DATABASE_URI", "sqlite:///travels.db"
+    )
+
+
+class TestingConfig(Config):
+    """Testing configuration."""
+
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "SQLALCHEMY_DATABASE_URI", "sqlite:///travels.db"
+    )
+
+
+config_by_name = {
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+    "testing": TestingConfig,
+}
