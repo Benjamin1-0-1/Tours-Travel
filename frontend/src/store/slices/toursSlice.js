@@ -1,13 +1,20 @@
-// frontend/src/store/slices/toursSlice.js
+// src/store/slices/toursSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Example fetch tours from Flask
+// If your route is "http://localhost:5500/apis/tours/v1/tours"
+const TOURS_LIST_URL = 'http://localhost:5500/apis/tours/v1/tours';
+
 export const fetchTours = createAsyncThunk(
   'tours/fetchTours',
-  async () => {
-    const response = await axios.get('http://localhost:5500/apis/tours/v1/tours');
-    return response.data.tours; // based on your API response
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(TOURS_LIST_URL);
+      // Suppose response is { "tours": [ { ... }, ... ] }
+      return response.data.tours;
+    } catch (err) {
+      return rejectWithValue('Failed to fetch tours');
+    }
   }
 );
 
@@ -26,11 +33,11 @@ const toursSlice = createSlice({
       })
       .addCase(fetchTours.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.tours = action.payload; // array of tours
+        state.tours = action.payload;
       })
       .addCase(fetchTours.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message;
+        state.error = action.payload;
       });
   },
 });

@@ -1,9 +1,9 @@
-// frontend/src/store/slices/authSlice.js
+// src/store/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-// Replace with your backend endpoint
-const BASE_URL = 'http://localhost:5000/api/auth';
+// Change BASE_URL if your Flask server is on a different port or prefix
+const BASE_URL = 'http://localhost:5500/api/auth';
 
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
@@ -14,7 +14,9 @@ export const registerUser = createAsyncThunk(
       });
       return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data.message || 'Registration failed');
+      return rejectWithValue(
+        err.response?.data?.message || 'Registration failed'
+      );
     }
   }
 );
@@ -26,7 +28,9 @@ export const loginUser = createAsyncThunk(
       const response = await axios.post(`${BASE_URL}/login`, { email, password });
       return response.data; // { message, token, user }
     } catch (err) {
-      return rejectWithValue(err.response.data.message || 'Login failed');
+      return rejectWithValue(
+        err.response?.data?.message || 'Login failed'
+      );
     }
   }
 );
@@ -43,31 +47,35 @@ const authSlice = createSlice({
     logout(state) {
       state.token = null;
       state.user = null;
+      state.error = null;
+      state.status = 'idle';
     }
   },
   extraReducers: (builder) => {
     builder
-      // Register
+      // REGISTER
       .addCase(registerUser.pending, (state) => {
         state.status = 'loading';
+        state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        // Registration success message or set user? We'll keep it simple
+        // Registration success (nothing special needed here, maybe show a message)
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
 
-      // Login
+      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading';
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.token = action.payload.token;
-        state.user = action.payload.user;
+        state.user = action.payload.user; // {id, email, user_name}
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';

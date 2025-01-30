@@ -1,9 +1,12 @@
-// frontend/src/components/ToursList.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './ToursList.css';
 
 function ToursList({ tours }) {
+  if (!tours || tours.length === 0) {
+    return <div>No tours available</div>;
+  }
+
   return (
     <div className="tours-container">
       {tours.map((tour) => (
@@ -20,7 +23,9 @@ function ToursList({ tours }) {
             <p className="tour-description">
               {tour.description?.substring(0, 60)}...
             </p>
-            <Link to={`/tours/${tour.id}`} className="view-btn">View More</Link>
+            <Link to={`/tours/${tour.id}`} className="view-btn">
+              View More
+            </Link>
           </div>
         </div>
       ))}

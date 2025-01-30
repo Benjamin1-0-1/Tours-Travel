@@ -1,18 +1,23 @@
-// frontend/src/pages/LoginPage.jsx
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../store/slices/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 function LoginPage() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    dispatch(loginUser({ email, password }));
+    const resultAction = await dispatch(loginUser({ email, password }));
+    if (resultAction.meta.requestStatus === 'fulfilled') {
+      // If success, go home
+      navigate('/');
+    }
   };
 
   return (
@@ -26,7 +31,6 @@ function LoginPage() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-
         <label>Password:</label>
         <input
           type="password"
@@ -39,7 +43,7 @@ function LoginPage() {
           {status === 'loading' ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }

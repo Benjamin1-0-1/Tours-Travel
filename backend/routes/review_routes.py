@@ -1,18 +1,19 @@
+# routes/review_routes.py
 from flask_restx import Namespace, Resource, reqparse, fields
 from models.review import Review
 from routes.r_ext import db
+# from datetime import datetime, timezone
 
-# ✅ Define a Namespace correctly
+# Create the Reviews namespace for Flask-RESTX
 review_ns = Namespace("reviews", description="Reviews Operations")
 
-# ✅ Define Request Parsers
 def create_review_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('tour_id', type=int, required=True, help='Tour ID is required')
     parser.add_argument('user_name', type=str, required=True, help='User Name required')
     parser.add_argument('rating', type=int, required=True, help='Please provide a rating')
     parser.add_argument('comment', type=str, required=True, help='Please add a comment')
-    parser.add_argument('created_at', type=str, required=True, help='Date created')
+    parser.add_argument('created_at', type=str,required=True, help='Date created')
     return parser
 
 review_parser = create_review_parser()
@@ -28,7 +29,7 @@ def create_review_patch_parser():
 
 review_patch_parser = create_review_patch_parser()
 
-# ✅ Define a model for request validation
+# A model for request validation with swagger docs in RESTX
 review_model = review_ns.model("Review", {
     "tour_id": fields.Integer(required=True, description="Tour ID"),
     "user_name": fields.String(required=True, description="User Name"),
@@ -37,20 +38,22 @@ review_model = review_ns.model("Review", {
     "created_at": fields.String(required=True, description="Date Created"),
 })
 
-# ✅ Serialize function
-def serialize_review(items):
+def serialize_review(item: Review):
     return {
-        'tour_id': items.tour_id,
-        'user_name': items.user_name,
-        'rating': items.rating,
-        'comment': items.comment,
-        'created_at': items.created_at
+        'id': item.id,
+        'tour_id': item.tour_id,
+        'user_name': item.user_name,
+        'rating': item.rating,
+        'comment': item.comment,
+        'created_at': item.created_at
     }
 
-# ✅ Collection Resource for Handling Multiple Reviews
 @review_ns.route("/v1/reviews")
 class ReviewsCollectionResource(Resource):
     def get(self):
+        """
+        GET /reviews => returns all reviews
+        """
         reviews = Review.query.all()
         return {
             "reviews": [serialize_review(review) for review in reviews]
@@ -58,13 +61,18 @@ class ReviewsCollectionResource(Resource):
 
     @review_ns.expect(review_model, validate=True)
     def post(self):
+        """
+        POST /reviews => create a new review
+        Expects JSON: { "tour_id", "user_name", "rating", "comment", "created_at" }
+        """
         args = review_parser.parse_args()
         new_review = Review(
             tour_id=args["tour_id"],
             user_name=args["user_name"],
             rating=args["rating"],
             comment=args["comment"],
-            created_at=args["created_at"],
+            # Optionally parse created_at from string if needed
+            created_at=args["created_at"]
         )
         db.session.add(new_review)
         try:
@@ -77,10 +85,12 @@ class ReviewsCollectionResource(Resource):
             db.session.rollback()
             return {"message": f"Failed to add review: {str(e)}"}, 500
 
-# ✅ Resource for Handling Single Review
 @review_ns.route("/v1/review/<int:id>")
 class ReviewResource(Resource):
     def get(self, id):
+        """
+        GET /reviews/<id> => returns a single review
+        """
         review = Review.query.get(id)
         if review:
             return {"review": serialize_review(review)}, 200
@@ -88,6 +98,9 @@ class ReviewResource(Resource):
 
     @review_ns.expect(review_model, validate=True)
     def put(self, id):
+        """
+        PUT /reviews/<id> => fully update a review
+        """
         review = Review.query.get(id)
         if not review:
             return {"message": "Review not found"}, 404
@@ -112,6 +125,9 @@ class ReviewResource(Resource):
 
     @review_ns.expect(review_patch_parser, validate=True)
     def patch(self, id):
+        """
+        PATCH /reviews/<id> => partial update of a review
+        """
         review = Review.query.get(id)
         if not review:
             return {"message": "Review not found"}, 404
@@ -133,6 +149,9 @@ class ReviewResource(Resource):
             return {"message": f"Failed to update review: {str(e)}"}, 500
 
     def delete(self, id):
+        """
+        DELETE /reviews/<id> => remove a review
+        """
         review = Review.query.get(id)
         if not review:
             return {"message": "Review not found"}, 404

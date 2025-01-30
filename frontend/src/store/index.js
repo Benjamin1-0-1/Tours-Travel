@@ -1,11 +1,11 @@
-// frontend/src/store/index.js
+// src/store/index.js
 import { configureStore } from '@reduxjs/toolkit';
+import authReducer from './slices/authSlice';
 import toursReducer from './slices/toursSlice';
-import userReducer from './slices/userSlice';
 
 export const store = configureStore({
   reducer: {
-    tours: toursReducer,
-    user: userReducer
+    auth: authReducer,
+    tours: toursReducer
   }
 });

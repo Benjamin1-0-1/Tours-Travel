@@ -1,17 +1,50 @@
 .navbar {
-    background-color: #008cba;
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem;
-  }
-  .logo {
-    font-weight: bold;
-    text-decoration: none;
-    color: #fff;
-  }
-  .nav-links a {
-    margin-left: 1rem;
-    text-decoration: none;
-    color: #fff;
-  }
+  background-color: #008cba;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+}
+
+.navbar-left .logo {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  color: #fff;
+  text-decoration: none;
+  margin-left: 1rem;
+  transition: opacity 0.2s;
+}
+
+.nav-link:hover {
+  opacity: 0.8;
+}
+
+.nav-username {
+  margin-left: 1rem;
+  font-weight: 500;
+}
+
+.logout-btn {
+  background: none;
+  border: 1px solid #fff;
+  color: #fff;
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  margin-left: 1rem;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background: #fff;
+  color: #008cba;
+}
