@@ -10,6 +10,7 @@ from flask_restx import Api
 from models.ext import db
 from config import Config
 from namespaces import all_namespaces
+from routes.auth_routes import auth_bp
 
 
 load_dotenv()
@@ -29,6 +30,8 @@ migrate = Migrate(app, db)
 db.init_app(app)
 jwt = JWTManager(app)
 CORS(app, origins=["http://localhost:3000"])
+
+app.register_blueprint(auth_bp)
 
 api = Api(
     app,
